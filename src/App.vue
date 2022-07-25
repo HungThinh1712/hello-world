@@ -2,7 +2,17 @@
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
     <HelloWorld msg="Welcome to Your Vue.js App"/>
-    <button  @click="install"> Install </button>
+     <div v-if="shown">
+    Add app to home screen?
+
+    <button @click="installPWA">
+      Install!
+    </button>
+
+    <button @click="dismissPrompt">
+      No, thanks
+    </button>
+  </div>
   </div>
 </template>
 
@@ -16,28 +26,34 @@ export default {
   },
   data() {
     return {
-      hasBackgroundImg: false,
-      deferredPrompt: null,
+      shown: false,
     };
   },
-  created() {
+  beforeMount() {
     window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      this.deferredPrompt = e;
-    });
-    window.addEventListener('appinstalled', () => {
-      this.deferredPrompt = null;
-    });
+      e.preventDefault()
+      this.installEvent = e
+      this.shown = true
+    })
   },
-   methods: {
-    dismiss() {
-      this.deferredPrompt = null;
+
+  methods: {
+    dismissPrompt() {
+      this.shown = false
     },
-    install() {
-      this.deferredPrompt.prompt();
+
+    installPWA() {
+      this.installEvent.prompt()
+      this.installEvent.userChoice.then((choice) => {
+        this.dismissPrompt() // Hide the prompt once the user's clicked
+        if (choice.outcome === 'accepted') {
+          // Do something additional if the user chose to install
+        } else {
+          // Do something additional if the user declined
+        }
+      })
     },
-  },
+  }
 }
 </script>
 
