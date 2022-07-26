@@ -2,7 +2,7 @@
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
     <HelloWorld msg="Welcome to Your Vue.js App"/>
-    <button  @click="install"> Install </button>
+    <button style="width: 100px; height: 500px"  @click="install"> Install </button>
   </div>
 </template>
 
@@ -16,26 +16,21 @@ export default {
   },
   data() {
     return {
-      hasBackgroundImg: false,
-      deferredPrompt: null,
+       installEvent: undefined,
     };
   },
-  created() {
+  beforeMount() {
     window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      this.deferredPrompt = e;
-    });
-    window.addEventListener('appinstalled', () => {
-      this.deferredPrompt = null;
-    });
+      e.preventDefault()
+      this.installEvent = e
+    })
   },
    methods: {
     dismiss() {
-      this.deferredPrompt = null;
+      this.installEvent = null;
     },
     install() {
-      this.deferredPrompt.prompt();
+        this.installEvent.prompt()
     },
   },
 }
